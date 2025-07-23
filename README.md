@@ -16,7 +16,7 @@ A lightweight C# client that connects to a Model Context Protocol (MCP) server u
 ## 📦 Prerequisites
 
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download)
-- An MCP server running on `http://localhost:5050`
+- An MCP server running on `http://{domain}:{port}`
 
 ---
 
