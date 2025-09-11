@@ -1,38 +1,58 @@
-﻿using ModelContextProtocol.Client;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Simple.Mcp.Sse.Client.Extensions;
+using Simple.Mcp.Sse.Client.HostedServices;
 
 
-namespace Simple.Mcp.Sse.Client
+namespace Simple.Mcp.Sse.Client;
+
+static class Program
 {
-    static class Program
+    static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
+        try
         {
-            const string McpServerUrl = "https://example.com/mcp"; // Replace with your MCP server URL
-
-            var options = new SseClientTransportOptions
-            {
-                Endpoint = new Uri(McpServerUrl),
-                Name = "LocalHttpClient",
-                ConnectionTimeout = TimeSpan.FromSeconds(15)
-            };
-
-            var transport = new SseClientTransport(options);
-            IMcpClient client = await McpClientFactory.CreateAsync(transport);
-
-            Console.WriteLine("✅ Connected to MCP server over SSE HTTP");
-
-            IList<McpClientTool> tools = await client.ListToolsAsync();
-
-            Console.WriteLine("\n🛠️ Available Tools:");
-
-
-            if (tools.Count > 0)
-            {
-                foreach (McpClientTool tool in tools)
-                    Console.WriteLine($" - {tool.Name}: {tool.Description}");
-            }
-
-            await client.DisposeAsync();
+            IHost host = CreateHostBuilder(args).Build();
+            
+            Console.WriteLine("🎯 Starting Professional Semantic Kernel MCP Client...");
+            
+            await host.RunAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Application startup failed: {ex.Message}");
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
     }
+
+    private static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                config.AddEnvironmentVariables();
+                config.AddCommandLine(args);
+            })
+            .ConfigureServices((context, services) =>
+            {
+                // Add application services
+                services.AddApplicationServices(context.Configuration);
+                
+                // Add the main application hosted service
+                services.AddHostedService<ApplicationHostedService>();
+            })
+            .ConfigureLogging((context, logging) =>
+            {
+                logging.ClearProviders();
+                logging.AddConsole();
+                logging.SetMinimumLevel(LogLevel.Information);
+                
+                // Reduce noise from some verbose libraries
+                logging.AddFilter("Microsoft.SemanticKernel", LogLevel.Warning);
+                logging.AddFilter("System.Net.Http", LogLevel.Warning);
+            })
+            .UseConsoleLifetime();
 }
