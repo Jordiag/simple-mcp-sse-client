@@ -15,12 +15,12 @@ static class Program
         try
         {
             IHost host = CreateHostBuilder(args).Build();
-            
-            Console.WriteLine("🎯 Starting Professional Semantic Kernel MCP Client...");
-            
+
+            Console.WriteLine("🎯 Starting Semantic Kernel MCP Client...");
+
             await host.RunAsync();
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             Console.WriteLine($"❌ Application startup failed: {ex.Message}");
             Console.WriteLine("Press any key to exit...");
@@ -40,7 +40,7 @@ static class Program
             {
                 // Add application services
                 services.AddApplicationServices(context.Configuration);
-                
+
                 // Add the main application hosted service
                 services.AddHostedService<ApplicationHostedService>();
             })
@@ -49,7 +49,7 @@ static class Program
                 logging.ClearProviders();
                 logging.AddConsole();
                 logging.SetMinimumLevel(LogLevel.Information);
-                
+
                 // Reduce noise from some verbose libraries
                 logging.AddFilter("Microsoft.SemanticKernel", LogLevel.Warning);
                 logging.AddFilter("System.Net.Http", LogLevel.Warning);

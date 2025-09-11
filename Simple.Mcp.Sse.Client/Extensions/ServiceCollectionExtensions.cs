@@ -1,10 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Simple.Mcp.Sse.Client.Configuration;
 using Simple.Mcp.Sse.Client.Plugins;
 using Simple.Mcp.Sse.Client.Services;
@@ -30,48 +29,50 @@ public static class ServiceCollectionExtensions
 
             IKernelBuilder kernelBuilder = Kernel.CreateBuilder();
 
+            // Get API key from environment variable
+            string? openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            string? azureOpenAiApiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY");
+
             // Configure AI service based on available configuration
-            if (!string.IsNullOrEmpty(kernelConfig.OpenAI.ApiKey))
+            if (!string.IsNullOrEmpty(openAiApiKey))
             {
-                logger.LogInformation("Configuring OpenAI service");
+                logger.LogInformation("Configuring OpenAI service with environment variable API key");
                 kernelBuilder.AddOpenAIChatCompletion(
                     kernelConfig.OpenAI.ModelId,
-                    kernelConfig.OpenAI.ApiKey);
+                    openAiApiKey);
             }
-            else if (!string.IsNullOrEmpty(kernelConfig.AzureOpenAI.ApiKey) && !string.IsNullOrEmpty(kernelConfig.AzureOpenAI.Endpoint))
+            else if (!string.IsNullOrEmpty(azureOpenAiApiKey) && !string.IsNullOrEmpty(kernelConfig.AzureOpenAI.Endpoint))
             {
-                logger.LogInformation("Configuring Azure OpenAI service");
+                logger.LogInformation("Configuring Azure OpenAI service with environment variable API key");
                 kernelBuilder.AddAzureOpenAIChatCompletion(
                     kernelConfig.AzureOpenAI.DeploymentName,
                     kernelConfig.AzureOpenAI.Endpoint,
-                    kernelConfig.AzureOpenAI.ApiKey);
+                    azureOpenAiApiKey);
             }
             else
             {
                 throw new InvalidOperationException(
-                    "No AI service configuration found. Please configure either OpenAI or Azure OpenAI in appsettings.json");
+                    "No AI service configuration found. Please set the OPENAI_API_KEY or AZURE_OPENAI_API_KEY environment variable.");
             }
 
             Kernel kernel = kernelBuilder.Build();
 
-            // Register MCP Tools Plugin
+            // Register MCP Tools Plugin with proper initialization
             IMcpService mcpService = serviceProvider.GetRequiredService<IMcpService>();
             ILogger<McpToolsPlugin> mcpLogger = serviceProvider.GetRequiredService<ILogger<McpToolsPlugin>>();
             McpToolsPlugin mcpPlugin = new(mcpService, mcpLogger);
 
-            // Initialize plugin and add to kernel
-            Task.Run(async () =>
+            // Initialize plugin synchronously
+            try
             {
-                try
-                {
-                    await mcpPlugin.InitializeAsync();
-                    logger.LogInformation("MCP Tools Plugin initialized successfully");
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Failed to initialize MCP Tools Plugin");
-                }
-            });
+                mcpPlugin.InitializeAsync().Wait();
+                logger.LogInformation("MCP Tools Plugin initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to initialize MCP Tools Plugin");
+                throw;
+            }
 
             kernel.Plugins.AddFromObject(mcpPlugin, "McpTools");
 

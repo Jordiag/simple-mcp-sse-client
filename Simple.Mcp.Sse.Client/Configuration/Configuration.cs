@@ -8,15 +8,13 @@ public class SemanticKernelConfiguration
 
 public class OpenAIConfiguration
 {
-    public string ApiKey { get; set; } = string.Empty;
-    public string ModelId { get; set; } = "gpt-4";
+    public string ModelId { get; set; } = "gpt-5-mini";
 }
 
 public class AzureOpenAIConfiguration
 {
-    public string ApiKey { get; set; } = string.Empty;
     public string Endpoint { get; set; } = string.Empty;
-    public string DeploymentName { get; set; } = "gpt-4";
+    public string DeploymentName { get; set; } = "gpt-5-mini";
 }
 
 public class McpServerConfiguration

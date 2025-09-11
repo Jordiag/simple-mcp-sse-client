@@ -23,10 +23,10 @@ public class ApplicationHostedService : BackgroundService
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
             Services.IApplicationService applicationService = scope.ServiceProvider.GetRequiredService<Services.IApplicationService>();
-            
+
             await applicationService.RunAsync(stoppingToken);
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception in ApplicationHostedService");
             throw;

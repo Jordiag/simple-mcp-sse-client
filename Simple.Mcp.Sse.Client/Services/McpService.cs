@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using ModelContextProtocol.Client;
 
 namespace Simple.Mcp.Sse.Client.Services;
@@ -29,13 +29,13 @@ public class McpService : IMcpService, IAsyncDisposable
 
     public async Task<IMcpClient> GetClientAsync()
     {
-        if (_client != null)
+        if(_client != null)
             return _client;
 
         await _initializationSemaphore.WaitAsync();
         try
         {
-            if (_client != null)
+            if(_client != null)
                 return _client;
 
             _logger.LogInformation("Connecting to MCP server at {Endpoint}", _configuration.Endpoint);
@@ -53,7 +53,7 @@ public class McpService : IMcpService, IAsyncDisposable
             _logger.LogInformation("Successfully connected to MCP server");
             return _client;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             _logger.LogError(ex, "Failed to connect to MCP server");
             throw;
@@ -73,7 +73,7 @@ public class McpService : IMcpService, IAsyncDisposable
             _logger.LogInformation("Retrieved {ToolCount} tools from MCP server", tools.Count);
             return tools;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             _logger.LogError(ex, "Failed to retrieve tools from MCP server");
             throw;
@@ -85,15 +85,15 @@ public class McpService : IMcpService, IAsyncDisposable
         try
         {
             IMcpClient client = await GetClientAsync();
-            
-            _logger.LogInformation("Invoking MCP tool {ToolName} with arguments: {Arguments}", 
+
+            _logger.LogInformation("Invoking MCP tool {ToolName} with arguments: {Arguments}",
                 toolName, System.Text.Json.JsonSerializer.Serialize(arguments));
 
             // Use dynamic type to handle the return without knowing exact type
             dynamic result = await client.CallToolAsync(toolName, arguments);
-            
+
             // Check if there's an error (handle different possible error representations)
-            if (result != null && (result.IsError == true || (result.GetType().GetProperty("Error")?.GetValue(result) != null)))
+            if(result != null && (result.IsError == true || (result.GetType().GetProperty("Error")?.GetValue(result) != null)))
             {
                 string errorMessage = "MCP tool returned an error";
                 _logger.LogError(errorMessage);
@@ -104,7 +104,7 @@ public class McpService : IMcpService, IAsyncDisposable
             _logger.LogInformation("MCP tool {ToolName} executed successfully", toolName);
             return response;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             string errorMessage = $"Failed to invoke MCP tool '{toolName}': {ex.Message}";
             _logger.LogError(ex, errorMessage);
@@ -114,7 +114,7 @@ public class McpService : IMcpService, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (_client != null)
+        if(_client != null)
         {
             await _client.DisposeAsync();
             _client = null;

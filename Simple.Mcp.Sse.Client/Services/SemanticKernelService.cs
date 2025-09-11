@@ -37,8 +37,8 @@ public class SemanticKernelService : ISemanticKernelService
             OpenAIPromptExecutionSettings settings = new()
             {
                 ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-                Temperature = 0.7,
                 MaxTokens = 2000
+                // Removed Temperature = 0.7 as it's not supported by gpt-4o-mini
             };
 
             KernelArguments arguments = new(settings);
@@ -67,8 +67,8 @@ public class SemanticKernelService : ISemanticKernelService
             OpenAIPromptExecutionSettings settings = new()
             {
                 ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-                Temperature = 0.7,
                 MaxTokens = 2000
+                // Removed Temperature = 0.7 as it's not supported by gpt-4o-mini
             };
 
             ChatMessageContent result = await _chatCompletionService.GetChatMessageContentAsync(history, settings, _kernel, cancellationToken);

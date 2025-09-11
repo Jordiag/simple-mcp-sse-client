@@ -1,7 +1,7 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.SemanticKernel;
 using System.ComponentModel;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using Microsoft.SemanticKernel;
 
 namespace Simple.Mcp.Sse.Client.Plugins;
 
@@ -23,16 +23,16 @@ public class McpToolsPlugin
         {
             IList<ModelContextProtocol.Client.McpClientTool> tools = await _mcpService.GetToolsAsync();
             _availableTools.Clear();
-            
-            foreach (ModelContextProtocol.Client.McpClientTool tool in tools)
+
+            foreach(ModelContextProtocol.Client.McpClientTool tool in tools)
             {
                 _availableTools[tool.Name] = tool;
                 _logger.LogDebug("Registered MCP tool: {ToolName} - {Description}", tool.Name, tool.Description);
             }
-            
+
             _logger.LogInformation("Initialized MCP Tools Plugin with {ToolCount} tools", _availableTools.Count);
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             _logger.LogError(ex, "Failed to initialize MCP Tools Plugin");
             throw;
@@ -43,7 +43,7 @@ public class McpToolsPlugin
     [Description("Lists all available MCP tools with their descriptions")]
     public async Task<string> ListAvailableTools()
     {
-        if (!_availableTools.Any())
+        if(!_availableTools.Any())
         {
             await InitializeAsync();
         }
@@ -63,7 +63,7 @@ public class McpToolsPlugin
     {
         try
         {
-            if (!_availableTools.ContainsKey(toolName))
+            if(!_availableTools.ContainsKey(toolName))
             {
                 return $"Error: Tool '{toolName}' not found. Use ListAvailableTools to see available tools.";
             }
@@ -71,10 +71,10 @@ public class McpToolsPlugin
             Dictionary<string, object> arguments;
             try
             {
-                arguments = JsonSerializer.Deserialize<Dictionary<string, object>>(argumentsJson) 
+                arguments = JsonSerializer.Deserialize<Dictionary<string, object>>(argumentsJson)
                            ?? new Dictionary<string, object>();
             }
-            catch (JsonException ex)
+            catch(JsonException ex)
             {
                 return $"Error: Invalid JSON in arguments: {ex.Message}";
             }
@@ -82,7 +82,7 @@ public class McpToolsPlugin
             string result = await _mcpService.InvokeToolAsync(toolName, arguments);
             return result;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             _logger.LogError(ex, "Error invoking MCP tool {ToolName}", toolName);
             return $"Error invoking tool '{toolName}': {ex.Message}";
@@ -94,12 +94,12 @@ public class McpToolsPlugin
     public async Task<string> GetToolInfo(
         [Description("The name of the MCP tool to get information about")] string toolName)
     {
-        if (!_availableTools.Any())
+        if(!_availableTools.Any())
         {
             await InitializeAsync();
         }
 
-        if (!_availableTools.TryGetValue(toolName, out ModelContextProtocol.Client.McpClientTool? tool))
+        if(!_availableTools.TryGetValue(toolName, out ModelContextProtocol.Client.McpClientTool? tool))
         {
             return $"Tool '{toolName}' not found. Use ListAvailableTools to see available tools.";
         }
