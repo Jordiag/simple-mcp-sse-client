@@ -90,7 +90,7 @@ public class McpService : IMcpService, IAsyncDisposable
                 toolName, System.Text.Json.JsonSerializer.Serialize(arguments));
 
             // Use dynamic type to handle the return without knowing exact type
-            dynamic result = await client.CallToolAsync(toolName, arguments);
+            ModelContextProtocol.Protocol.CallToolResult? result = await client.CallToolAsync(toolName, arguments);
 
             // Check if there's an error (handle different possible error representations)
             if(result != null && (result.IsError == true || (result.GetType().GetProperty("Error")?.GetValue(result) != null)))
@@ -100,9 +100,24 @@ public class McpService : IMcpService, IAsyncDisposable
                 return errorMessage;
             }
 
-            string response = result?.Content?.ToString() ?? result?.ToString() ?? "No content returned";
+            string resultText;
+            if(result == null || result.Content == null)
+            {
+                string errorMessage = "MCP tool returned no content";
+                _logger.LogError(errorMessage);
+                return errorMessage;
+            }
+            else if (result.Content is IEnumerable<string> strContent)
+            {
+                resultText = string.Join(", ", strContent);
+            }
+            else
+            {
+                resultText = System.Text.Json.JsonSerializer.Serialize(result.Content);
+            }
+
             _logger.LogInformation("MCP tool {ToolName} executed successfully", toolName);
-            return response;
+            return resultText;
         }
         catch(Exception ex)
         {
