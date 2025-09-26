@@ -2,11 +2,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModelContextProtocol.Client;
 
-namespace Simple.Mcp.Sse.Client.Services;
+namespace Simple.Mcp.Http.Client.Services;
 
 public interface IMcpService
 {
-    Task<IMcpClient> GetClientAsync();
+    Task<McpClient> GetClientAsync();
     Task<IList<McpClientTool>> GetToolsAsync();
     Task<string> InvokeToolAsync(string toolName, Dictionary<string, object> arguments);
     ValueTask DisposeAsync();
@@ -16,7 +16,7 @@ public class McpService : IMcpService, IAsyncDisposable
 {
     private readonly Configuration.McpServerConfiguration _configuration;
     private readonly ILogger<McpService> _logger;
-    private IMcpClient? _client;
+    private McpClient? _client;
     private readonly SemaphoreSlim _initializationSemaphore = new(1, 1);
 
     public McpService(
@@ -27,7 +27,7 @@ public class McpService : IMcpService, IAsyncDisposable
         _logger = logger;
     }
 
-    public async Task<IMcpClient> GetClientAsync()
+    public async Task<McpClient> GetClientAsync()
     {
         if(_client != null)
             return _client;
@@ -40,15 +40,15 @@ public class McpService : IMcpService, IAsyncDisposable
 
             _logger.LogInformation("Connecting to MCP server at {Endpoint}", _configuration.Endpoint);
 
-            SseClientTransportOptions options = new()
+            HttpClientTransportOptions options = new()
             {
                 Endpoint = new Uri(_configuration.Endpoint),
                 Name = _configuration.Name,
                 ConnectionTimeout = TimeSpan.FromSeconds(_configuration.ConnectionTimeoutSeconds)
             };
 
-            SseClientTransport transport = new(options);
-            _client = await McpClientFactory.CreateAsync(transport);
+            HttpClientTransport transport = new(options);
+            _client = await McpClient.CreateAsync(transport);
 
             _logger.LogInformation("Successfully connected to MCP server");
             return _client;
@@ -68,7 +68,7 @@ public class McpService : IMcpService, IAsyncDisposable
     {
         try
         {
-            IMcpClient client = await GetClientAsync();
+            McpClient client = await GetClientAsync();
             IList<McpClientTool> tools = await client.ListToolsAsync();
             _logger.LogInformation("Retrieved {ToolCount} tools from MCP server", tools.Count);
             return tools;
@@ -84,7 +84,7 @@ public class McpService : IMcpService, IAsyncDisposable
     {
         try
         {
-            IMcpClient client = await GetClientAsync();
+            McpClient client = await GetClientAsync();
 
             _logger.LogInformation("Invoking MCP tool {ToolName} with arguments: {Arguments}",
                 toolName, System.Text.Json.JsonSerializer.Serialize(arguments));

@@ -2,11 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Simple.Mcp.Sse.Client.Extensions;
-using Simple.Mcp.Sse.Client.HostedServices;
+using Simple.Mcp.Http.Client.Extensions;
+using Simple.Mcp.Http.Client.HostedServices;
 
 
-namespace Simple.Mcp.Sse.Client;
+namespace Simple.Mcp.Http.Client;
 
 static class Program
 {

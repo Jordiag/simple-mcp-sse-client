@@ -123,7 +123,7 @@ Once running, you can interact with the AI assistant in natural language:
 The application follows a clean, good architecture:
 
 ```
-Simple.Mcp.Sse.Client/
+Simple.Mcp.Http.Client/
 ├── Configuration/          # Configuration models
 ├── Extensions/            # Dependency injection extensions
 ├── HostedServices/        # Background services

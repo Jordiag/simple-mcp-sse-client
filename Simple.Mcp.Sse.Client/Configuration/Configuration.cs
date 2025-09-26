@@ -1,4 +1,4 @@
-namespace Simple.Mcp.Sse.Client.Configuration;
+namespace Simple.Mcp.Http.Client.Configuration;
 
 public class SemanticKernelConfiguration
 {

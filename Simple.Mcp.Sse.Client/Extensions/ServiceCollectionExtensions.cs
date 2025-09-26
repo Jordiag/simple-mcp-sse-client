@@ -4,11 +4,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Simple.Mcp.Sse.Client.Configuration;
-using Simple.Mcp.Sse.Client.Plugins;
-using Simple.Mcp.Sse.Client.Services;
+using Simple.Mcp.Http.Client.Configuration;
+using Simple.Mcp.Http.Client.Plugins;
+using Simple.Mcp.Http.Client.Services;
 
-namespace Simple.Mcp.Sse.Client.Extensions;
+namespace Simple.Mcp.Http.Client.Extensions;
 
 public static class ServiceCollectionExtensions
 {

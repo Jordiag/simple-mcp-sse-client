@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Simple.Mcp.Sse.Client.HostedServices;
+namespace Simple.Mcp.Http.Client.HostedServices;
 
 public class ApplicationHostedService : BackgroundService
 {

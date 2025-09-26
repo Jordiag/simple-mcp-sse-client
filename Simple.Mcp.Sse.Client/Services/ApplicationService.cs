@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel.ChatCompletion;
 
-namespace Simple.Mcp.Sse.Client.Services;
+namespace Simple.Mcp.Http.Client.Services;
 
 public interface IApplicationService
 {

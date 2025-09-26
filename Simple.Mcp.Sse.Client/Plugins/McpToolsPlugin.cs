@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 
-namespace Simple.Mcp.Sse.Client.Plugins;
+namespace Simple.Mcp.Http.Client.Plugins;
 
 public class McpToolsPlugin
 {
